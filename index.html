@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="content="width=device-width, initial-scale=1.0"">
+    <title>The Royal Investment | Bespoke Commission Invoice</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap');
+
+        /* --- 50 SHADES OF BROWN LUXURY THEME --- */
+        :root {
+            --bg-deep: #1a120b;      /* Darkest Espresso */
+            --bg-card: #2c1e16;      /* Rich Mocha */
+            --text-gold: #d4af37;    /* Metallic Gold */
+            --text-cream: #f5e6d3;   /* Champagne/Cream */
+            --accent-bronze: #8c6a49; 
+            --border-gold: #c5a059;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-cream);
+            background-image: radial-gradient(circle at 50% 0%, #3e2723 0%, #1a120b 80%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, .royal-font {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.05em;
+        }
+
+        /* Glassmorphism Card Style */
+        .royal-card {
+            background: rgba(44, 30, 22, 0.85); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .royal-card:hover {
+            border-color: var(--text-gold);
+            transform: translateY(-2px);
+        }
+
+        /* Interactive Package Card */
+        .package-card {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            /* Added min-height to balance the cards now that they have more content */
+            min-height: 250px; 
+        }
+        .package-card:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-color: var(--text-gold);
+        }
+        .package-card.selected {
+            background-color: #3e2723; /* Darker brown selection */
+            border-color: var(--text-gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            transform: scale(1.03);
+        }
+        
+        /* Form Inputs */
+        input, select, textarea {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #5d4037;
+            color: white;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--text-gold);
+            background-color: rgba(0, 0, 0, 0.5);
+            outline: none;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Gold Gradient Text */
+        .text-gradient-gold {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Buttons */
+        .btn-gold {
+            background: linear-gradient(135deg, #b38728 0%, #fcf6ba 50%, #bf953f 100%);
+            color: #1a120b;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(191, 149, 63, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-gold:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(191, 149, 63, 0.6);
+        }
+        
+        /* Detail Blocks */
+        .detail-block {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--border-gold);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a120b; }
+        ::-webkit-scrollbar-thumb { background: #5d4037; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-gold); }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            body { 
+                background: white !important; 
+                color: black !important; 
+                font-family: 'Times New Roman', serif;
+            }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .royal-card { 
+                background: white !important; 
+                box-shadow: none !important; 
+                border: 2px solid black !important;
+                color: black !important;
+                backdrop-filter: none;
+            }
+            input, select, textarea {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ccc !important;
+            }
+            .text-gradient-gold {
+                background: none;
+                -webkit-text-fill-color: black;
+                color: black;
+            }
+            #chart-section { display: none; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Print Header -->
+    <div class="print-only text-center mb-8 border-b-2 border-black pb-4">
+        <h1 class="text-4xl font-bold uppercase">Official Photography Invoice & Agreement</h1>
+        <p>Prepared for: <span id="print-client-name">Valued Client</span></p>
+        <p>Date Generated: <span id="print-date"></span></p>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-7xl mx-auto space-y-12">
+
+        <!-- 1. HERO SECTION -->
+        <header class="text-center space-y-4 py-10 no-print">
+            <div class="inline-block border-t-2 border-b-2 border-yellow-600 py-2 px-8 mb-4">
+                <span class="text-gold tracking-[0.3em] text-sm uppercase">The 2026 Collection</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl royal-font font-bold text-gradient-gold mb-2">
+                The Royal Investment
+            </h1>
+            <p class="text-xl text-gray-300 font-light max-w-3xl mx-auto">
+                Bespoke photographic legacies. <br>
+                <span class="text-sm italic text-yellow-600">Documenting the "50 Shades of Brown" Aesthetic with Uncompromising Luxury.</span>
+            </p>
+        </header>
+
+        <!-- 2. COMPARISON DIAGRAM (MIXED CHART) -->
+        <section id="chart-section" class="royal-card p-6 rounded-xl no-print">
+            <h2 class="text-2xl royal-font text-gold mb-6 border-b border-gray-700 pb-2">
+                <i class="fa-solid fa-chart-column mr-2"></i> Comparative Value Analysis
+            </h2>
+            <div class="relative h-96 w-full">
+                <canvas id="pricingChart"></canvas>
+            </div>
+            <p class="text-center text-xs text-gray-400 mt-4">Visualizing Investment vs. Coverage Hours & Deliverables.</p>
+        </section>
+
+        <form id="invoiceForm" onsubmit="event.preventDefault(); window.print();">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- LEFT COLUMN: Client Details & Questionnaire -->
+                <div class="lg:col-span-2 space-y-8">
+                    
+                    <!-- CLIENT DETAILS -->
+                    <div class="royal-card p-8 rounded-xl">
+                        <h2 class="text-2xl royal-font text-gold mb-6"><i class="fa-solid fa-user-pen mr-2"></i> Wedding Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="col-span-2">
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Couple's Names</label>
+                                <input type="text" id="clientNames" placeholder="Enter Bride & Groom Names" class="w-full p-3 rounded" oninput="updatePrintName()">
+                                <input type="hidden" id="selectedWeddingPackage" value="0">
+                                <input type="hidden" id="selectedEngagementPackage" value="0">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Wedding Date</label>
+                                <input type="date" id="weddingDate" class="w-full p-3 rounded" onchange="generateSmartSchedule()">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Est. Guest Count</label>
+                                <input type="number" class="w-full p-3 rounded" placeholder="e.g. 200">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Wedding Venue(s)</label>
+                                <input type="text" class="w-full p-3 rounded mb-2" placeholder="Ceremony Location:">
+                                <input type="text" class="w-full p-3 rounded" placeholder="Reception Location:">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DETAILED QUESTIONNAIRE -->
+                    <div class="royal-card p-8 rounded-xl">
+                        <h2 class="text-2xl royal-font text-gold mb-6"><i class="fa-solid fa-list-check mr-2"></i> Photographic Vision & Preferences</h2>
+                        
+                        <div class="space-y-8">
+                            
+                            <!-- Photography Preferences -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Package & Timeline</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Package Interest (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="e.g. Full Day, Engagement, Elopement...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Wedding Day Timeline (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="Ceremony Start, Reception Start, etc..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Special Moments to Capture (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="First Look, Specific Family Combos, etc..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Style & Aesthetic -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Style & Aesthetic</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Photography Style Preference (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="Traditional, Candid, Artistic, Documentary...">
+                                        <input type="text" class="w-full p-2 rounded mt-2" placeholder="Link to examples/mood board (optional)">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Color Themes & Decor (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="Wedding colors, specific decor items to capture..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Engagement Session -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Engagement Session</h3>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-gold mb-1">Interested?</label>
+                                            <select class="w-full p-2 rounded">
+                                                <option>Yes</option>
+                                                <option>No</option>
+                                                <option>Maybe</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-gold mb-1">Location Idea (Custom Field)</label>
+                                            <input type="text" class="w-full p-2 rounded" placeholder="Where?">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Season/Time (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="e.g. Fall, Sunset...">
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Budget & Add-ons -->
+                             <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Budget & Add-Ons</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Photography Budget (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="Enter budget range...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Desired Add-Ons (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="Albums, Prints, Second Shooter..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact & Info -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Contact & Details</h3>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Best Contact Method (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="Email, Phone, Text...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Response Time (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="e.g. 24 Hours">
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Referral Source (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="How did you hear about us?">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Special Requests / Personal Touch (Custom Field)</label>
+                                        <textarea rows="3" class="w-full p-2 rounded" placeholder="Any stories, themes, or questions not covered?"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Package Selection & Smart Invoice -->
+                <div class="lg:col-span-1 space-y-8">
+                    
+                    <!-- PACKAGE SELECTION (INTERACTIVE CARDS) -->
+                    <div class="royal-card p-6 rounded-xl border-l-4 border-yellow-600">
+                        <h2 class="text-xl royal-font text-gold mb-4">Engagement Tiers</h2>
+                        <div id="engagement-packages" class="grid grid-cols-2 gap-3 mb-6">
+                            <!-- Engagement cards will be rendered here -->
+                        </div>
+
+                        <h2 class="text-xl royal-font text-gold mb-4 mt-6 border-t border-gray-700 pt-4">Wedding Collections</h2>
+                        <div id="wedding-packages" class="grid grid-cols-2 gap-3">
+                            <!-- Wedding cards will be rendered here -->
+                        </div>
+                        
+                        <!-- Add-Ons -->
+                        <div class="mt-6 border-t border-gray-700 pt-4">
+                            <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">À La Carte Extras</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center justify-between text-sm bg-black/20 p-2 rounded cursor-pointer">
+                                    <span><input type="checkbox" class="addon-check accent-yellow-600 mr-2" value="400" onchange="calculateTotal()"> Second Photographer</span>
+                                    <span class="text-gold">$400</span>
+                                </label>
+                                <label class="flex items-center justify-between text-sm bg-black/20 p-2 rounded cursor-pointer">
+                                    <span><input type="checkbox" class="addon-check accent-yellow-600 mr-2" value="250" onchange="calculateTotal()"> Rush Edit (14 Days)</span>
+                                    <span class="text-gold">$250</span>
+                                </label>
+                                <label class="flex items-center justify-between text-sm bg-black/20 p-2 rounded cursor-pointer">
+                                    <span><input type="checkbox" class="addon-check accent-yellow-600 mr-2" value="150" onchange="calculateTotal()"> Instant Print Station</span>
+                                    <span class="text-gold">$150</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMART INVOICE & CALENDAR -->
+                    <div class="royal-card p-6 rounded-xl bg-gradient-to-br from-gray-900 to-black border border-yellow-600/50">
+                        <h2 class="text-xl royal-font text-gold mb-4 text-center">Payment Schedule</h2>
+                        
+                        <div class="space-y-4 text-sm">
+                            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                                <span class="text-gray-400">Total Investment</span>
+                                <span id="totalDisplay" class="text-2xl font-bold text-white">$0.00</span>
+                            </div>
+                            
+                            <!-- Smart Calendar Visualization -->
+                            <div id="smart-calendar" class="space-y-3 pt-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-600 mr-3"></div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase">Retainer (25%) - Due Now</p>
+                                        <p id="retainerDisplay" class="font-bold text-gold">$0.00</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-700/50 mr-3"></div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase">Mid-Point (50%) - Due <span id="midDate">TBD</span></p>
+                                        <p id="midDisplay" class="font-bold text-gray-300">$0.00</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-900/30 mr-3"></div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase">Final Balance - Due <span id="finalDate">TBD</span></p>
+                                        <p id="finalDisplay" class="font-bold text-gray-300">$0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Payment Method</label>
+                                <select class="w-full p-2 rounded text-xs">
+                                    <option>Bank Transfer / Zelle</option>
+                                    <option>Credit Card (Invoice)</option>
+                                    <option>Cash / Check</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-gold w-full py-4 rounded-xl text-lg shadow-2xl no-print">
+                        <i class="fa-solid fa-file-pdf mr-2"></i> Save Invoice as PDF
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- TERMS (Collapsible) -->
+            <div class="mt-12 royal-card p-8 rounded-xl no-print">
+                <h3 class="text-xl royal-font text-gold mb-4">Terms & Conditions of Service</h3>
+                <div class="text-xs text-gray-400 space-y-2 h-32 overflow-y-auto border border-gray-800 p-4 rounded">
+                    <p><strong>1. Retainer:</strong> A 25% non-refundable retainer is required to secure the date.</p>
+                    <p><strong>2. Vendor Meals:</strong> A hot meal is required for coverage over 6 hours.</p>
+                    <p><strong>3. Exclusivity:</strong> We are the sole professional photographers for the event.</p>
+                    <p><strong>4. Delivery:</strong> Final images delivered within 6-8 weeks via private vault.</p>
+                    <p><strong>5. Overtime:</strong> Billed at $150/hr beyond contracted time (after 90min grace period).</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // --- DATA: Packages & Details (UPDATED WITH DETAILED INCLUSIONS) ---
+        const engagementPackages = {
+            '175': { 
+                name: 'E1. Classic Session', 
+                hours: 1, 
+                images: 50, 
+                retail_price: 350, 
+                desc: 'A quick, essential session for save-the-dates.',
+                focus: 'Simple & Candid', 
+                details: [
+                    '1 hour coverage', // Specific Hour Detail
+                    'One setting/location', // Specific Location Detail
+                    'One outfit change', // Specific Outfit Detail
+                    '50 Edited Digital Images',
+                    'Focus on natural interaction and ring details',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '300': { 
+                name: 'E2. Extended Session', 
+                hours: 1.5, 
+                images: 75, 
+                retail_price: 600, 
+                desc: 'More time and locations for a richer portfolio.',
+                focus: 'Aesthetic & Cinematic',
+                details: [
+                    '1.5 hours coverage', // Specific Hour Detail
+                    'Two settings/locations (within local travel)', // Specific Location Detail
+                    'Up to two outfit changes', // Specific Outfit Detail
+                    '75 Edited Digital Images',
+                    'Styled shoot focusing on aesthetic details', 
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '350': { 
+                name: 'E3. Signature Session', 
+                hours: 2, 
+                images: 100, 
+                retail_price: 800, 
+                desc: 'The full cinematic experience with detailed styling.',
+                focus: 'Storytelling & High Detail', 
+                details: [
+                    '2 hours coverage', // Specific Hour Detail
+                    'Unlimited settings (local travel)', // Specific Location Detail
+                    'Unlimited outfit changes (max 3)', // Specific Outfit Detail
+                    '100 Edited Digital Images + Proof Box',
+                    'Special attention to Hair, Nails, and personalized props',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            }
+        };
+
+        const weddingPackages = {
+            '250': { 
+                name: 'P1. Micro-Ceremony Snap', 
+                hours: 1, 
+                video: false, 
+                images: 100, 
+                retail_price: 600, 
+                desc: 'Vows, Rings, Legal Ceremony Only. Perfect for courthouse or backyard events.',
+                focus: 'Pure Documentation', 
+                details: [
+                    '1 hour coverage (Ceremony/Vows)',
+                    'Focus on **Nails and Hair** details', // Explicitly requested inclusion detail
+                    'Marriage License Signing Documentation',
+                    'Basic Couple Portraits (5 min post-ceremony)', 
+                    '100 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '395': { 
+                name: 'P2. Elopement Essentials', 
+                hours: 1.5, 
+                video: false, 
+                images: 150, 
+                retail_price: 990, 
+                desc: 'Ceremony + Portraits. Focused, efficient coverage.',
+                focus: 'Focused & Efficient', 
+                details: [
+                    '1.5 hours coverage',
+                    'Coverage includes: **Bouquet, Dress, and Bridesmaids**', // Explicitly requested inclusion detail
+                    'Full Ceremony Documentation', 
+                    'Couple Portraits (30 min dedicated session)', 
+                    'Limited Family Formals (5 groups)', 
+                    '150 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '450': { 
+                name: 'P3. Core Coverage', 
+                hours: 3, 
+                video: false, 
+                images: 250, 
+                retail_price: 1200, 
+                desc: 'Ceremony, Family Formals, Decor. Capturing the key traditions.',
+                focus: 'Key Traditions & Family', 
+                details: [
+                    '3 hours coverage',
+                    'Includes Full Bridal Party Portraits (45 min session)', 
+                    'Extensive Family Formals (up to 10 groups)', 
+                    'Detailed Reception Setup Shots (Cake, Favors, Centerpieces)', 
+                    '250 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '695': { 
+                name: 'P4. Mid-Day Story', 
+                hours: 5, 
+                video: false, 
+                images: 400, 
+                retail_price: 1800, 
+                desc: 'Partial Prep, Ceremony, Grand Entrance. Expanding the story.',
+                focus: 'Preparations & Beginning Story', 
+                details: [
+                    '5 hours coverage',
+                    'Partial Getting Ready (1 hour)', 
+                    'First Look Session (Full documentation)', 
+                    'Ceremony & Grand Entrance', 
+                    '400 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '900': { 
+                name: 'P5. Comprehensive', 
+                hours: 6, 
+                video: false, 
+                images: 500, 
+                retail_price: 2400, 
+                desc: 'Full Prep, Ceremony, Toasts, Dances. Telling the complete tale.',
+                focus: 'Complete Tale & Reception Intro', 
+                details: [
+                    '6 hours coverage',
+                    'Full Getting Ready Coverage (2 locations)', 
+                    'Bridal Party Group Shots & Individual Portraits', 
+                    'Reception Toasts & Speeches', 
+                    '500 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '1050': { 
+                name: 'P6. Full Day Classic', 
+                hours: 7, 
+                video: true, 
+                images: 550, 
+                retail_price: 2800, 
+                desc: 'Includes 1 Min Highlight Video + Sunset Shots. Cinematic addition.',
+                focus: 'Cinematic Moments & Golden Hour', 
+                details: [
+                    '7 hours coverage',
+                    'Dedicated Sunset/Golden Hour Portraits (30 min)', 
+                    '1 Min Highlight Video Reel', 
+                    'Full Dance Floor Action', 
+                    '550 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '1495': { 
+                name: 'P7. Royal Lite', 
+                hours: 8, 
+                video: true, 
+                images: 600, 
+                retail_price: 3600, 
+                desc: 'Luxury Album Credit + Priority Editing. Premium experience.',
+                focus: 'Premium Coverage & Priority', 
+                details: [
+                    '8 hours coverage',
+                    '$300 Luxury Album Credit', 
+                    'Priority Editing (4 Weeks Delivery)', 
+                    'Full Entourage Portraits', 
+                    '600 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '1995': { 
+                name: 'P8. Essential Story', 
+                hours: 9, 
+                video: true, 
+                images: 650, 
+                retail_price: 4500, 
+                desc: 'Wood Keepsake Box, 650+ Images. Physical keepsakes included.',
+                focus: 'Tangible Keepsakes & Atmosphere', 
+                details: [
+                    '9 hours coverage',
+                    'Engraved Wood Keepsake Box (10 prints)', 
+                    'Custom Portrait Location Time', 
+                    'Extended Reception Candids',
+                    '650 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '2850': { 
+                name: 'P9. Classic Luxury', 
+                hours: 10, 
+                video: true, 
+                images: 750, 
+                retail_price: 6000, 
+                desc: 'Comprehensive Portraits, Album Consultation. High-end service.',
+                focus: 'Extended Luxury & Design', 
+                details: [
+                    '10 hours coverage',
+                    'Album Design Consultation Session', 
+                    'Full Reception Coverage (until final exit)', 
+                    'Detailed Decor and Stationery Documentation', 
+                    '750 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '3750': { 
+                name: 'P10. Platinum Cinematic', 
+                hours: 10, 
+                video: true, 
+                images: 850, 
+                retail_price: 7500, 
+                desc: '2 Photographers + 3 Min Cinematic Video + Drone. The full production.',
+                focus: 'Full Production & Dual Perspective', 
+                details: [
+                    '10 hours coverage',
+                    'Two Lead Photographers', 
+                    '3 Min Cinematic Film + Drone Coverage', 
+                    'Rehearsal Dinner Coverage (1hr)', 
+                    '850 Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            },
+            '4995': { 
+                name: 'P11. The Grand Narrative', 
+                hours: 12, 
+                video: true, 
+                images: 999, 
+                retail_price: 10000, 
+                desc: 'THE ULTIMATE: 2 Photographers, Complimentary Signature Session, Custom Luxury Album.',
+                focus: 'The Ultimate, Unlimited Storytelling', 
+                details: [
+                    '12 hours coverage',
+                    '2 Lead Photographers', 
+                    'Complimentary E3 Signature Engagement Session',
+                    'Custom Luxury 12x12" Album Included',
+                    'Full Documentary Coverage (Prep to Grand Exit)',
+                    '999+ Edited Digital Images',
+                    'Quartz Protective Coating (Archival Quality)'
+                ] 
+            }
+        };
+
+
+        // --- FUNCTIONS ---
+
+        function updatePrintName() {
+            const val = document.getElementById('clientNames').value;
+            document.getElementById('print-client-name').innerText = val ? val : "Valued Client";
+        }
+
+        function renderPackages() {
+            const engContainer = document.getElementById('engagement-packages');
+            const wedContainer = document.getElementById('wedding-packages');
+            
+            // Render Engagement Packages
+            let engHtml = '';
+            for (const price in engagementPackages) {
+                const pkg = engagementPackages[price];
+                engHtml += renderCard(price, pkg, 'engagement');
+            }
+            engContainer.innerHTML = engHtml;
+
+            // Render Wedding Packages
+            let wedHtml = '';
+            for (const price in weddingPackages) {
+                const pkg = weddingPackages[price];
+                wedHtml += renderCard(price, pkg, 'wedding');
+            }
+            wedContainer.innerHTML = wedHtml;
+        }
+
+        function renderCard(price, pkg, type) {
+            
+            // Generate the detailed list of inclusions
+            // Using existing small font and list style to minimize visual impact
+            let detailList = '<ul class="text-[0.6rem] text-gray-300 space-y-0.5 mt-1 opacity-90">';
+            pkg.details.forEach(detail => {
+                // Using a small checkmark icon
+                detailList += `<li class="flex items-start"><i class="fa-solid fa-check text-green-400 mr-1 mt-0.5 text-[0.5rem]"></i>${detail}</li>`;
+            });
+            detailList += '</ul>';
+
+            return `
+                <div id="${type}-${price}" class="package-card p-3 rounded-lg flex flex-col justify-between" 
+                     onclick="selectPackage('${price}', '${type}')">
+                    <div>
+                        <p class="text-xs text-gold uppercase font-bold">${pkg.name}</p>
+                        <p class="text-xs text-gray-400 mt-1">${pkg.hours} hrs | ${pkg.images}+ Images</p>
+                        <p class="text-[0.6rem] text-red-400 mt-1 line-through">Retail: $${pkg.retail_price.toLocaleString()}</p>
+                        <!-- INJECTED DETAILED LIST -->
+                        ${detailList} 
+                    </div>
+                    <div class="mt-2 text-right">
+                        <p class="text-xl royal-font font-bold text-gradient-gold">$${price}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectPackage(price, type) {
+            // This function handles selection state and total calculation.
+            const containerId = type === 'wedding' ? 'wedding-packages' : 'engagement-packages';
+            const hiddenInputId = type === 'wedding' ? 'selectedWeddingPackage' : 'selectedEngagementPackage';
+            
+            // 1. Deselect all others of this type
+            document.querySelectorAll(`#${containerId} .package-card`).forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // 2. Select the current card
+            const selectedCard = document.getElementById(`${type}-${price}`);
+            selectedCard.classList.add('selected');
+            
+            // 3. Update hidden input for calculation
+            document.getElementById(hiddenInputId).value = price;
+            
+            // 4. Recalculate Total
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            // Read from hidden inputs updated by selectPackage()
+            const weddingPrice = parseInt(document.getElementById('selectedWeddingPackage').value) || 0;
+            const engPrice = parseInt(document.getElementById('selectedEngagementPackage').value) || 0;
+            
+            // Add-ons
+            let addons = 0;
+            document.querySelectorAll('.addon-check:checked').forEach(cb => addons += parseInt(cb.value));
+
+            // Logic: P11 gets E3 Signature free (price is 350)
+            let finalEngPrice = engPrice;
+            if (weddingPackages['4995'] && weddingPackages['4995'].name === 'P11. The Grand Narrative' && weddingPrice === 4995 && engPrice === 350) {
+                finalEngPrice = 0; // Complimentary
+            }
+
+            const total = weddingPrice + finalEngPrice + addons;
+            const retainer = total * 0.25;
+            const mid = (total - retainer) * 0.50;
+            const final = (total - retainer) - mid;
+
+            document.getElementById('totalDisplay').innerText = '$' + total.toLocaleString();
+            document.getElementById('retainerDisplay').innerText = '$' + retainer.toLocaleString();
+            document.getElementById('midDisplay').innerText = '$' + mid.toLocaleString();
+            document.getElementById('finalDisplay').innerText = '$' + final.toLocaleString();
+        }
+
+        function generateSmartSchedule() {
+            const dateStr = document.getElementById('weddingDate').value;
+            if (!dateStr) return;
+
+            const weddingDate = new Date(dateStr);
+            
+            // Midpoint: 4 months prior
+            const midDate = new Date(weddingDate);
+            midDate.setMonth(midDate.getMonth() - 4);
+
+            // Final: 1 month prior
+            const finalDate = new Date(weddingDate);
+            finalDate.setMonth(finalDate.getMonth() - 1);
+
+            document.getElementById('midDate').innerText = midDate.toLocaleDateString();
+            document.getElementById('finalDate').innerText = finalDate.toLocaleDateString();
+        }
+
+        // --- CHART JS (MIXED BAR/LINE) ---
+        function initializeChart() {
+            const ctx = document.getElementById('pricingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar', // Base type
+                data: {
+                    labels: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11'],
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Investment ($)',
+                            data: [250, 395, 450, 695, 900, 1050, 1495, 1995, 2850, 3750, 4995],
+                            backgroundColor: [
+                                '#d4af37', '#c5a059', '#b08d55', '#a47e48', '#966e3c', 
+                                '#895f31', '#7c5026', '#6f421c', '#623513', '#56280b', '#4b1c04' 
+                            ],
+                            borderColor: 'rgba(212, 175, 55, 0.5)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'Hours of Coverage',
+                            data: [1, 1.5, 3, 5, 6, 7, 8, 9, 10, 10, 12],
+                            borderColor: '#f5e6d3', // Cream Line
+                            borderWidth: 2,
+                            pointBackgroundColor: '#d4af37',
+                            pointRadius: 4,
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { labels: { color: '#f5e6d3' } },
+                        tooltip: {
+                             mode: 'index',
+                             intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#c5a059', callback: function(value) { return '$' + value; } }, 
+                            grid: { color: '#2c1e16' },
+                            title: { display: true, text: 'Investment Price', color: '#c5a059' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#f5e6d3' },
+                            title: { display: true, text: 'Coverage Hours', color: '#f5e6d3' }
+                        },
+                        x: { 
+                            ticks: { color: '#c5a059' }, 
+                            grid: { display: false } 
+                        }
+                    }
+                }
+            });
+        }
+
+
+        window.onload = function() {
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString();
+            initializeChart();
+            renderPackages();
+            calculateTotal(); // Initialize total to 0.00
+        };
+    </script>
+</body>
+</html>
