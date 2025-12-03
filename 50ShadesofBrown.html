@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Royal Investment | GK Commission Invoice</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap');
+
+        /* --- 50 SHADES OF BROWN LUXURY THEME --- */
+        :root {
+            --bg-deep: #1a120b;      /* Darkest Espresso */
+            --bg-card: #2c1e16;      /* Rich Mocha */
+            --text-gold: #d4af37;    /* Metallic Gold */
+            --text-cream: #f5e6d3;   /* Champagne/Cream */
+            --accent-bronze: #8c6a49; 
+            --border-gold: #c5a059;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-cream);
+            background-image: radial-gradient(circle at 50% 0%, #3e2723 0%, #1a120b 80%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, .royal-font {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.05em;
+        }
+
+        /* Glassmorphism Card Style */
+        .royal-card {
+            background: rgba(44, 30, 22, 0.9); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .royal-card:hover {
+            border-color: var(--text-gold);
+            transform: translateY(-2px);
+        }
+
+        /* Interactive Package Card */
+        .package-card {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            height: auto;
+            min-height: 300px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .package-card:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-color: var(--text-gold);
+        }
+        .package-card.selected {
+            background-color: #3e2723; /* Darker brown selection */
+            border-color: var(--text-gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            transform: scale(1.02);
+        }
+        
+        /* Form Inputs */
+        input, select, textarea {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #5d4037;
+            color: white;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--text-gold);
+            background-color: rgba(0, 0, 0, 0.5);
+            outline: none;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Gold Gradient Text */
+        .text-gradient-gold {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Buttons */
+        .btn-gold {
+            background: linear-gradient(135deg, #b38728 0%, #fcf6ba 50%, #bf953f 100%);
+            color: #1a120b;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(191, 149, 63, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-gold:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(191, 149, 63, 0.6);
+        }
+        
+        /* --- PRINT STYLES --- */
+        @media print {
+            body { 
+                background: white !important; 
+                color: black !important; 
+                font-family: 'Times New Roman', serif;
+            }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .royal-card { 
+                background: white !important; 
+                box-shadow: none !important; 
+                border: 2px solid black !important;
+                color: black !important;
+                backdrop-filter: none;
+            }
+            input, select, textarea {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ccc !important;
+            }
+            .text-gradient-gold {
+                background: none;
+                -webkit-text-fill-color: black;
+                color: black;
+            }
+            .llm-output-box {
+                border: 1px dashed black !important;
+                padding: 10px;
+                margin-top: 10px;
+            }
+        }
+        .print-only { display: none; }
+
+        /* Reminder styles */
+        .reminder-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+        .reminder-icon {
+            background-color: var(--text-gold);
+            color: var(--bg-deep);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.7);
+        }
+        .reminder-icon:hover {
+            transform: scale(1.1);
+        }
+        .reminder-content {
+            display: none;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--text-gold);
+            pointer-events: none; /* Make sure it doesn't block clicks */
+        }
+        .reminder-container:hover .reminder-content {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Modal for LLM Output */
+        .llm-modal {
+            background-color: rgba(26, 18, 11, 0.95); /* Semi-transparent dark background */
+            z-index: 100;
+        }
+        .llm-modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--text-gold);
+            max-height: 80vh;
+            overflow-y: auto;
+            /* Style the scrollbar for the modal content */
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-bronze) var(--bg-card);
+        }
+        .llm-modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .llm-modal-content::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+        .llm-modal-content::-webkit-scrollbar-thumb {
+            background-color: var(--accent-bronze);
+            border-radius: 4px;
+            border: 2px solid var(--bg-card);
+        }
+        /* Loading Spinner Animation */
+        .spinner {
+            border-top-color: var(--text-gold);
+            border-left-color: var(--text-gold);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Print Header -->
+    <div class="print-only text-center mb-8 border-b-2 border-black pb-4">
+        <h1 class="text-4xl font-bold uppercase">Official Photography Invoice & Agreement</h1>
+        <p>Prepared for: <span id="print-client-name">Valued Client</span></p>
+        <p>Date Generated: <span id="print-date"></span></p>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-7xl mx-auto space-y-12">
+
+        <!-- 1. HERO SECTION -->
+        <header class="text-center space-y-4 py-10 no-print">
+            <div class="inline-block border-t-2 border-b-2 border-yellow-600 py-2 px-8 mb-4">
+                <span class="text-gold tracking-[0.3em] text-sm uppercase">The 2026 Collection</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl royal-font font-bold text-gradient-gold mb-2">
+                The Royal Investment
+            </h1>
+            <p class="text-xl text-gray-300 font-light max-w-3xl mx-auto">
+                Bespoke photographic legacies. <br>
+                <span class="text-sm italic text-yellow-600">Documenting the "50 Shades of Brown" Aesthetic with Uncompromising Luxury.</span>
+            </p>
+        </header>
+
+        <form id="invoiceForm" onsubmit="event.preventDefault(); window.print();">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- LEFT COLUMN: Client Details & Questionnaire -->
+                <div class="lg:col-span-2 space-y-8">
+                    
+                    <!-- CLIENT DETAILS -->
+                    <div class="royal-card p-8 rounded-xl">
+                        <h2 class="text-2xl royal-font text-gold mb-6"><i class="fa-solid fa-user-pen mr-2"></i> Wedding Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="col-span-2">
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Couple's Names</label>
+                                <div class="relative">
+                                    <input type="text" id="clientNames" placeholder="Enter Bride & Groom Names" class="w-full p-3 rounded pr-44" oninput="updatePrintName()">
+                                    <button type="button" onclick="draftInvitation()" 
+                                            class="absolute right-0 top-0 h-full px-3 text-xs font-semibold rounded-r bg-yellow-600 text-black hover:bg-yellow-500 transition">
+                                        ✨ Draft Invitation
+                                    </button>
+                                </div>
+                                
+                                <input type="hidden" id="selectedWeddingPackagePrice" value="0">
+                                <input type="hidden" id="selectedEngagementPackagePrice" value="0">
+                                <input type="hidden" id="selectedWeddingPackageHours" value="0"> <!-- Added for LLM use -->
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Wedding Date</label>
+                                <input type="date" id="weddingDate" class="w-full p-3 rounded" onchange="generateSmartSchedule()">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Est. Guest Count</label>
+                                <input type="number" id="guestCount" class="w-full p-3 rounded" placeholder="e.g. 200">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Wedding Venue(s)</label>
+                                <input type="text" id="ceremonyVenue" class="w-full p-3 rounded mb-2" placeholder="Ceremony Location:">
+                                <input type="text" id="receptionVenue" class="w-full p-3 rounded" placeholder="Reception Location:">
+                            </div>
+                            <!-- LLM Feature 1 Button -->
+                            <div class="col-span-2 mt-4">
+                                <button type="button" onclick="generateTimeline()" 
+                                        class="w-full bg-yellow-700 text-white p-3 rounded-lg font-semibold hover:bg-yellow-800 transition duration-150 shadow-lg royal-font text-sm">
+                                    ✨ Generate AI Smart Timeline Draft
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2 italic text-center">Requires Date, Venues, and a selected Wedding Package.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DETAILED QUESTIONNAIRE (Kept for completeness as requested in previous steps) -->
+                    <div class="royal-card p-8 rounded-xl no-print">
+                        <h2 class="text-2xl royal-font text-gold mb-6"><i class="fa-solid fa-list-check mr-2"></i> Photographic Vision & Preferences</h2>
+                        <div class="space-y-8">
+                            
+                            <!-- Photography Preferences -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Package & Timeline</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Package Interest (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="e.g. Full Day, Engagement, Elopement...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Wedding Day Timeline (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="Ceremony Start, Reception Start, etc..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Special Moments to Capture (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="First Look, Specific Family Combos, etc..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Style & Aesthetic -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Style & Aesthetic</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Photography Style Preference (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="Traditional, Candid, Artistic, Documentary...">
+                                        <input type="text" class="w-full p-2 rounded mt-2" placeholder="Link to examples/mood board (optional)">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Color Themes & Decor (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="Wedding colors, specific decor items to capture..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Engagement Session -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Engagement Session</h3>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-gold mb-1">Interested?</label>
+                                            <select class="w-full p-2 rounded">
+                                                <option>Yes</option>
+                                                <option>No</option>
+                                                <option>Maybe</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Date</label>
+                                            <input type="date" class="w-full p-2 rounded">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-gold mb-1">Location Idea (Custom Field)</label>
+                                            <input type="text" class="w-full p-2 rounded" placeholder="Where?">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Season/Time (Custom Field)</label>
+                                            <input type="text" class="w-full p-2 rounded" placeholder="e.g. Fall, Sunset...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Budget & Add-ons -->
+                             <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Budget & Details</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Photography Budget (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="Enter budget range...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Desired Add-Ons (Custom Field)</label>
+                                        <textarea rows="2" class="w-full p-2 rounded" placeholder="Albums, Prints, Second Shooter..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact & Info -->
+                            <div>
+                                <h3 class="text-lg royal-font text-gray-300 mb-3 border-b border-gray-700">Contact & Details</h3>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Best Contact Method (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="Email, Phone, Text...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Response Time (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="e.g. 24 Hours">
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Referral Source (Custom Field)</label>
+                                        <input type="text" class="w-full p-2 rounded" placeholder="How did you hear about us?">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs uppercase tracking-wider text-gold mb-1">Special Requests / Personal Touch (Custom Field)</label>
+                                        <textarea rows="3" class="w-full p-2 rounded" placeholder="Any stories, themes, or questions not covered?"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Package Selection & Smart Invoice -->
+                <div class="lg:col-span-1 space-y-8">
+                    
+                    <!-- PACKAGE SELECTION (INTERACTIVE CARDS) -->
+                    <div class="royal-card p-6 rounded-xl border-l-4 border-yellow-600">
+                        <h2 class="text-xl royal-font text-gold mb-4">Engagement Tiers</h2>
+                        <div id="engagement-packages" class="grid grid-cols-2 gap-3 mb-6">
+                            <!-- Engagement cards will be rendered here -->
+                        </div>
+
+                        <h2 class="text-xl royal-font text-gold mb-4 mt-6 border-t border-gray-700 pt-4">Wedding Collections</h2>
+                        <div id="wedding-packages" class="grid grid-cols-2 gap-3">
+                            <!-- Wedding cards will be rendered here -->
+                        </div>
+                        
+                        <!-- Add-Ons -->
+                        <div class="mt-6 border-t border-gray-700 pt-4">
+                            <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2">À La Carte Extras</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center justify-between text-sm bg-black/20 p-2 rounded cursor-pointer">
+                                    <span><input type="checkbox" id="addon-second-shooter" class="addon-check accent-yellow-600 mr-2" value="400" onchange="calculateTotal()"> Second Photographer</span>
+                                    <span class="text-gold">$400</span>
+                                </label>
+                                <label class="flex items-center justify-between text-sm bg-black/20 p-2 rounded cursor-pointer">
+                                    <span><input type="checkbox" id="addon-rush-edit" class="addon-check accent-yellow-600 mr-2" value="250" onchange="calculateTotal()"> Rush Edit (14 Days)</span>
+                                    <span class="text-gold">$250</span>
+                                </label>
+                                <label class="flex items-center justify-between text-sm bg-black/20 p-2 rounded cursor-pointer">
+                                    <span><input type="checkbox" id="addon-print-station" class="addon-check accent-yellow-600 mr-2" value="150" onchange="calculateTotal()"> Instant Print Station</span>
+                                    <span class="text-gold">$150</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMART INVOICE & CALENDAR -->
+                    <div class="royal-card p-6 rounded-xl bg-gradient-to-br from-gray-900 to-black border border-yellow-600/50">
+                        <h2 class="text-xl royal-font text-gold mb-4 text-center">Payment Schedule</h2>
+                        
+                        <div class="space-y-4 text-sm">
+                            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                                <span class="text-gray-400">Total Investment</span>
+                                <span id="totalDisplay" class="text-2xl font-bold text-white">$0.00</span>
+                            </div>
+                            
+                            <!-- Smart Calendar Visualization -->
+                            <div id="smart-calendar" class="space-y-3 pt-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-600 mr-3"></div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase">Retainer (25%) - Due Now</p>
+                                        <p id="retainerDisplay" class="font-bold text-gold">$0.00</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-700/50 mr-3"></div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase">Mid-Point (50%) - Due <span id="midDate">TBD</span></p>
+                                        <p id="midDisplay" class="font-bold text-gray-300">$0.00</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-900/30 mr-3"></div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase">Final Balance (25%) - Due <span id="finalDate">TBD</span></p>
+                                        <p id="finalDisplay" class="font-bold text-gray-300">$0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <label class="block text-xs uppercase tracking-wider text-gold mb-1">Preferred Payment Method</label>
+                                <select class="w-full p-2 rounded text-xs">
+                                    <option>Bank Transfer / Zelle</option>
+                                    <option>Credit Card (Invoice)</option>
+                                    <option>Cash / Check</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-gold w-full py-4 rounded-xl text-lg shadow-2xl no-print">
+                        <i class="fa-solid fa-file-pdf mr-2"></i> Save Invoice as PDF
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Final Instructions & Terms (PRESERVED) -->
+            <div class="mt-12 royal-card p-8 rounded-xl no-print border-l-4 border-yellow-600">
+                <h3 class="text-xl royal-font text-gold mb-4 border-b border-gray-700 pb-2">Finalization & Agreement</h3>
+                
+                <!-- PDF & Booking Instructions (PRESERVED) -->
+                <div class="mb-6 p-4 bg-yellow-900/20 rounded border border-yellow-600/50">
+                    <p class="text-lg font-bold text-gradient-gold mb-2">NEXT STEPS FOR BOOKING</p>
+                    <p class="text-sm text-gray-300 space-y-2">
+                        <span class="block">
+                            **1. Save as PDF:** Please save this entire document as a PDF using your browser's print function (usually found in the File menu or by pressing Ctrl+P/Cmd+P).
+                        </span>
+                        <span class="block">
+                            **2. Send to Planner:** Text the saved PDF to discuss booking at: <span class="text-lg font-extrabold text-white tracking-wide">662-497-6601</span>.
+                        </span>
+                        <span class="block text-red-400">
+                            **3. Agreement:** Final arrangements, contract signing, and payment setup will **ONLY** be made once both parties have agreed upon the reviewed details of this invoice.
+                        </span>
+                    </p>
+                </div>
+
+                <!-- Terms & Conditions (PRESERVED) -->
+                <h4 class="text-sm font-semibold text-gray-400 mb-2 border-t border-gray-700 pt-4">Terms & Conditions of Service (Summary)</h4>
+                <div class="text-xs text-gray-400 space-y-2 h-32 overflow-y-auto border border-gray-800 p-4 rounded">
+                    <p><strong>1. Retainer:</strong> A 25% non-refundable retainer is required to secure the date.</p>
+                    <p><strong>2. Vendor Meals:</strong> A hot meal is required for coverage over 6 hours.</p>
+                    <p><strong>3. Exclusivity:</strong> We are the sole professional photographers for the event.</p>
+                    <p><strong>4. Delivery:</strong> Final images delivered within 6-8 weeks via private vault.</p>
+                    <p><strong>5. Overtime:</strong> Billed at $150/hr beyond contracted time (after 90min grace period).</p>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Hovering Reminder (PRESERVED) -->
+    <div class="reminder-container no-print">
+        <div class="flex items-end justify-end">
+            <!-- Content Box (Hidden by default, shown on hover) -->
+            <div class="reminder-content mr-3 mb-1 p-4 rounded-xl shadow-2xl max-w-xs transform origin-bottom-right">
+                <p class="font-bold text-lg text-gradient-gold mb-2 royal-font">Important Reminder</p>
+                <p class="text-sm text-gray-300">
+                    Deposits are required to secure your date. Payment information and the official schedule will be set up immediately upon mutual agreement after the completion of the invoice review by both parties.
+                </p>
+            </div>
+            <!-- Icon Button -->
+            <div class="reminder-icon w-14 h-14 rounded-full flex items-center justify-center shadow-xl cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 0 1.5 0V9a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-6 0V9a.75.75 0 0 1 1.5 0v3.75a.75.75 0 0 0 1.5 0V9a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- LLM Output Modal/Message Box -->
+    <div id="llm-modal" class="llm-modal fixed inset-0 hidden items-center justify-center p-4">
+        <div class="llm-modal-content p-6 rounded-xl shadow-2xl w-full max-w-3xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 id="llm-modal-title" class="text-2xl font-bold royal-font text-gradient-gold"></h3>
+                <button id="llm-modal-close" class="text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+            <div id="llm-modal-text" class="text-gray-300 space-y-4 prose prose-invert max-w-none">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 llm-modal hidden items-center justify-center">
+        <div class="flex flex-col items-center p-8 royal-card rounded-xl">
+            <div class="spinner w-10 h-10 border-4 border-gray-700 border-solid rounded-full border-t-transparent mb-3"></div>
+            <p class="text-lg text-gold royal-font">Generating Royal Inspiration...</p>
+            <p class="text-xs text-gray-400 mt-1">The AI is crafting your bespoke content.</p>
+        </div>
+    </div>
+    
+    <script>
+        // --- GEMINI API Configuration ---
+        const apiKey = ""; // API key is provided by the environment
+        const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+
+        // --- Data: Packages & Details ---
+        const engagementPackages = {
+            '175': { name: 'E1. Classic Session', hours: 1, images: 50, retail_price: 350, desc: 'A quick, essential session for save-the-dates.', details: ['1 hour coverage', 'One setting/location', 'One outfit change', '50 Edited Digital Images', 'Focus on natural interaction and ring details', 'Quartz Protective Coating (Archival Quality)'] },
+            '300': { name: 'E2. Extended Session', hours: 1.5, images: 75, retail_price: 600, desc: 'More time and locations for a richer portfolio.', details: ['1.5 hours coverage', 'Two settings/locations (within local travel)', 'Up to two outfit changes', '75 Edited Digital Images', 'Styled shoot focusing on aesthetic details', 'Quartz Protective Coating (Archival Quality)'] },
+            '350': { name: 'E3. Signature Session', hours: 2, images: 100, retail_price: 800, desc: 'The full cinematic experience with detailed styling.', details: ['2 hours coverage', 'Unlimited settings (local travel)', 'Unlimited outfit changes (max 3)', '100 Edited Digital Images + Proof Box', 'Special attention to Hair, Nails, and personalized props', 'Quartz Protective Coating (Archival Quality)'] }
+        };
+
+        const weddingPackages = {
+            '250': { name: 'P1. Micro-Ceremony Snap', hours: 1, video: false, images: 100, retail_price: 600, desc: 'Vows, Rings, Legal Ceremony Only. Perfect for courthouse or backyard events.', details: ['1 hour coverage (Ceremony/Vows)', 'Focus on **Nails and Hair** details', 'Marriage License Signing Documentation', 'Basic Couple Portraits (5 min post-ceremony)', '100 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '395': { name: 'P2. Elopement Essentials', hours: 1.5, video: false, images: 150, retail_price: 990, desc: 'Ceremony + Portraits. Focused, efficient coverage.', details: ['1.5 hours coverage', 'Coverage includes: **Bouquet, Dress, and Bridesmaids**', 'Full Ceremony Documentation', 'Couple Portraits (30 min dedicated session)', 'Limited Family Formals (5 groups)', '150 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '450': { name: 'P3. Core Coverage', hours: 3, video: false, images: 250, retail_price: 1200, desc: 'Ceremony, Family Formals, Decor. Capturing the key traditions.', details: ['3 hours coverage', 'Includes Full Bridal Party Portraits (45 min session)', 'Extensive Family Formals (up to 10 groups)', 'Detailed Reception Setup Shots (Cake, Favors, Centerpieces)', '250 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '695': { name: 'P4. Mid-Day Story', hours: 5, video: false, images: 400, retail_price: 1800, desc: 'Partial Prep, Ceremony, Grand Entrance. Expanding the story.', details: ['5 hours coverage', 'Partial Getting Ready (1 hour)', 'First Look Session (Full documentation)', 'Ceremony & Grand Entrance', '400 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '900': { name: 'P5. Comprehensive', hours: 6, video: false, images: 500, retail_price: 2400, desc: 'Full Prep, Ceremony, Toasts, Dances. Telling the complete tale.', details: ['6 hours coverage', 'Full Getting Ready Coverage (2 locations)', 'Bridal Party Group Shots & Individual Portraits', 'Reception Toasts & Speeches', '500 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '1050': { name: 'P6. Full Day Classic', hours: 7, video: true, images: 550, retail_price: 2800, desc: 'Includes 1 Min Highlight Video + Sunset Shots. Cinematic addition.', details: ['7 hours coverage', 'Dedicated Sunset/Golden Hour Portraits (30 min)', '1 Min Highlight Video Reel', 'Full Dance Floor Action', '550 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '1495': { name: 'P7. Royal Lite', hours: 8, video: true, images: 600, retail_price: 3600, desc: 'Luxury Album Credit + Priority Editing. Premium experience.', details: ['8 hours coverage', '$300 Luxury Album Credit', 'Priority Editing (4 Weeks Delivery)', 'Full Entourage Portraits', '600 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '1995': { name: 'P8. Essential Story', hours: 9, video: true, images: 650, retail_price: 4500, desc: 'Wood Keepsake Box, 650+ Images. Physical keepsakes included.', details: ['9 hours coverage', 'Engraved Wood Keepsake Box (10 prints)', 'Custom Portrait Location Time', 'Extended Reception Candids', '650 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '2850': { name: 'P9. Classic Luxury', hours: 10, video: true, images: 750, retail_price: 6000, desc: 'Comprehensive Portraits, Album Consultation. High-end service.', details: ['10 hours coverage', 'Album Design Consultation Session', 'Full Reception Coverage (until final exit)', 'Detailed Decor and Stationery Documentation', '750 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '3750': { name: 'P10. Platinum Cinematic', hours: 10, video: true, images: 850, retail_price: 7500, desc: '2 Photographers + 3 Min Cinematic Video + Drone. The full production.', details: ['10 hours coverage', 'Two Lead Photographers', '3 Min Cinematic Film + Drone Coverage', 'Rehearsal Dinner Coverage (1hr)', '850 Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] },
+            '4995': { name: 'P11. The Grand Narrative', hours: 12, video: true, images: 999, retail_price: 10000, desc: 'THE ULTIMATE: 2 Photographers, Complimentary Signature Session, Custom Luxury Album.', details: ['12 hours coverage', '2 Lead Photographers', 'Complimentary E3 Signature Engagement Session', 'Custom Luxury 12x12" Album Included', 'Full Documentary Coverage (Prep to Grand Exit)', '999+ Edited Digital Images', 'Quartz Protective Coating (Archival Quality)'] }
+        };
+
+        // --- DOM Elements (Caches references for efficiency) ---
+        let clientNamesInput;
+        let weddingDateInput;
+        let printClientNameEl;
+        let printDateEl;
+        let totalDisplay;
+        let retainerDisplay;
+        let midDateEl;
+        let midDisplay;
+        let finalDateEl;
+        let finalDisplay;
+        let engagementPackagesContainer;
+        let weddingPackagesContainer;
+        let llmModal;
+        let llmModalTitle;
+        let llmModalText;
+        let loadingOverlay;
+        let weddingPackageHoursInput;
+        let guestCountInput;
+        let ceremonyVenueInput;
+        let receptionVenueInput;
+
+        // --- Utility Functions for UI & LLM ---
+
+        /**
+         * Generic fetch wrapper with exponential backoff for API calls.
+         */
+        async function exponentialBackoffFetch(url, options, retries = 5, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status !== 429) { // Not a rate limit error
+                        return response;
+                    }
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+            }
+            throw new Error("API call failed after multiple retries due to rate limiting or connection issues.");
+        }
+
+        /**
+         * Displays the LLM output in the custom modal.
+         */
+        function showLLMOutput(title, content) {
+            llmModalTitle.textContent = title;
+            // Convert markdown text to HTML for better display (simple replacement for newlines/bold)
+            let htmlContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .replace(/\n\n/g, '</p><p>') // Paragraphs
+                .replace(/\n/g, '<br>') // Line breaks
+                .replace(/^- (.*)/gm, '<li>$1</li>') // Simple list items
+                .replace(/([0-9]+\.) (.*)/gm, '<li>$1 $2</li>'); // Numbered list items
+            
+            // Wrap in <p> tags if it's not starting with an HTML tag (to handle markdown block)
+            if (!htmlContent.trim().startsWith('<')) {
+                 htmlContent = `<p>${htmlContent}</p>`;
+            }
+            htmlContent = `<ul>${htmlContent}</ul>`.replace(/<ul><p>/g, '<ul>').replace(/<\/p><\/ul>/g, '</ul>'); // Cleanup for lists
+            
+            llmModalText.innerHTML = htmlContent;
+            llmModal.classList.remove('hidden');
+            llmModal.classList.add('flex');
+        }
+
+        /**
+         * Toggles the loading overlay visibility.
+         */
+        function toggleLoading(show) {
+            loadingOverlay.classList.toggle('hidden', !show);
+            loadingOverlay.classList.toggle('flex', show);
+        }
+
+        // --- LLM Feature 1: Generate Smart Timeline ---
+        async function generateTimeline() {
+            const names = clientNamesInput.value.trim();
+            const date = weddingDateInput.value;
+            const hours = weddingPackageHoursInput.value;
+            const guests = guestCountInput.value;
+            const ceremony = ceremonyVenueInput.value.trim();
+            const reception = receptionVenueInput.value.trim();
+            
+            if (!names || !date || hours === '0' || !ceremony) {
+                showLLMOutput("Missing Information", "Please enter the Couple's Names, Wedding Date, Ceremony Venue, and select a Photography Package before generating the timeline.");
+                return;
+            }
+
+            toggleLoading(true);
+
+            const prompt = `Act as a world-class luxury wedding planner and photography director for an event branded "The Royal Investment." Based on the following data, create a detailed, hour-by-hour photography timeline and shot list. Assume the photographer needs to start the timeline approximately ${hours} hours before the ceremony ends to maximize coverage.
+
+**Client Data:**
+- Couple: ${names}
+- Wedding Date: ${date}
+- Photography Package Hours: ${hours} hours
+- Ceremony Venue: ${ceremony}
+- Reception Venue: ${reception || 'Same location as ceremony'}
+- Estimated Guests: ${guests || '150'}
+
+**Instructions for Output:**
+1.  **Format the output as a timeline** with timestamps (e.g., "1:00 PM - 2:00 PM: Activity").
+2.  Start with the final Grand Exit/End of coverage and work backward based on the total hours. Assume an evening wedding (e.g., exit around 9:00 PM).
+3.  Include key segments: Getting Ready, First Look, Ceremony, Family Formals, Couple Portraits, Sunset Portraits, Reception Highlights, and Grand Exit.
+4.  Maintain a luxurious, professional, and confident tone.
+5.  Do not include any introductory or concluding remarks. Just provide the timeline.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are a luxury wedding planner assistant. Generate a highly detailed and professionally formatted photography timeline." }]
+                },
+            };
+
+            try {
+                const response = await exponentialBackoffFetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "The AI could not generate the timeline. Please refine your inputs.";
+                
+                toggleLoading(false);
+                showLLMOutput("✨ AI Smart Timeline Draft", text);
+            } catch (error) {
+                console.error("Gemini API Timeline Error:", error);
+                toggleLoading(false);
+                showLLMOutput("API Error", "We encountered an issue connecting to the AI service. Please check your network and try again.");
+            }
+        }
+
+        // --- LLM Feature 2: Draft Invitation Text ---
+        async function draftInvitation() {
+            const names = clientNamesInput.value.trim();
+            const date = weddingDateInput.value;
+
+            if (!names || !date) {
+                showLLMOutput("Missing Information", "Please enter the Couple's Names and Wedding Date to draft the invitation.");
+                return;
+            }
+
+            toggleLoading(true);
+
+            const prompt = `Act as a luxury copywriter for a high-end wedding planner. Draft three versions of a "Save the Date" announcement (formal email, casual text, and social media post) for a couple named "${names}" with a wedding date of "${date}".
+
+**Instructions for Output:**
+1.  Use an elegant, luxurious, and formal tone, matching "The Royal Investment" brand.
+2.  Provide the three versions clearly separated by headings (e.g., "Formal Email Draft").
+3.  Do not include any introductory or concluding remarks. Just provide the three drafts.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are a luxury event copywriter. Generate three distinct, elegant 'Save the Date' drafts." }]
+                },
+            };
+
+            try {
+                const response = await exponentialBackoffFetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "The AI could not generate the invitation draft. Please try again.";
+                
+                toggleLoading(false);
+                showLLMOutput("✨ Draft Save-The-Date Text", text);
+            } catch (error) {
+                console.error("Gemini API Invitation Draft Error:", error);
+                toggleLoading(false);
+                showLLMOutput("API Error", "We encountered an issue connecting to the AI service. Please check your network and try again.");
+            }
+        }
+
+        // --- Core Application Functions (Modified/Preserved) ---
+
+        /**
+         * Renders the HTML cards for a given set of packages.
+         */
+        function renderPackages(packages, container, type) {
+            let html = '';
+            // Convert object keys to an array to iterate over prices
+            Object.keys(packages).forEach(price => {
+                const pkg = packages[price];
+                
+                // Generate the detailed list of inclusions
+                let detailList = '<ul class="text-[0.6rem] text-gray-300 space-y-0.5 mt-2 max-h-36 overflow-y-auto">';
+                pkg.details.forEach(detail => {
+                    // Using a small checkmark icon
+                    detailList += `<li class="flex items-start"><i class="fa-solid fa-check text-green-400 mr-1 mt-0.5 text-[0.5rem]"></i><span class="leading-tight">${detail}</span></li>`;
+                });
+                detailList += '</ul>';
+
+                // Pass the hours data in the onclick function as well
+                html += `
+                    <div id="${type}-${price}" class="package-card p-3 rounded-xl flex flex-col" 
+                         onclick="selectPackage('${price}', '${type}', ${pkg.hours})">
+                        <div>
+                            <p class="text-xs text-gold uppercase font-bold">${pkg.name}</p>
+                            <p class="text-xs text-gray-400 mt-1">${pkg.hours} hrs | ${pkg.images}+ Images</p>
+                            <p class="text-[0.6rem] text-red-400 mt-1 line-through">Retail: $${pkg.retail_price.toLocaleString()}</p>
+                            <!-- INJECTED DETAILED LIST -->
+                            ${detailList} 
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-gray-700 text-right">
+                            <p class="text-xl royal-font font-bold text-gradient-gold">$${price}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        /**
+         * Handles the selection of a package card.
+         * Added hours parameter to update the hidden input.
+         */
+        function selectPackage(price, type, hours = 0) {
+            const containerId = type === 'wedding' ? 'wedding-packages' : 'engagement-packages';
+            const hiddenInputId = type === 'wedding' ? 'selectedWeddingPackagePrice' : 'selectedEngagementPackagePrice';
+            
+            // 1. Deselect all others of this type
+            document.querySelectorAll(`#${containerId} .package-card`).forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // 2. Select the current card
+            const selectedCard = document.getElementById(`${type}-${price}`);
+            selectedCard.classList.add('selected');
+            
+            // 3. Update hidden inputs for calculation and LLM
+            document.getElementById(hiddenInputId).value = price;
+            if (type === 'wedding') {
+                weddingPackageHoursInput.value = hours;
+            }
+            
+            // 4. Recalculate Total
+            calculateTotal();
+        }
+
+        /**
+         * Calculates the total investment based on selected packages and add-ons.
+         */
+        function calculateTotal() {
+            let total = 0;
+            
+            const weddingPrice = parseInt(document.getElementById('selectedWeddingPackagePrice').value) || 0;
+            const engagementPrice = parseInt(document.getElementById('selectedEngagementPackagePrice').value) || 0;
+            
+            total += weddingPrice;
+            total += engagementPrice;
+            
+            // 2. Get Add-on prices
+            document.querySelectorAll('.addon-check:checked').forEach(checkbox => {
+                total += parseInt(checkbox.value);
+            });
+
+            // 3. Update displays
+            totalDisplay.textContent = formatCurrency(total);
+            
+            // Calculate Payment Schedule (25% retainer, 50% midpoint, 25% final)
+            const retainer = total * 0.25;
+            const finalBalance = total * 0.25;
+            const midPayment = total * 0.50;
+
+            retainerDisplay.textContent = formatCurrency(retainer);
+            midDisplay.textContent = formatCurrency(midPayment);
+            finalDisplay.textContent = formatCurrency(finalBalance);
+
+            // Update payment dates based on wedding date
+            generateSmartSchedule();
+        }
+
+        /**
+         * Updates the due dates for the payment schedule based on the wedding date.
+         */
+        function generateSmartSchedule() {
+            const weddingDateStr = weddingDateInput.value;
+            const total = parseFloat(totalDisplay.textContent.replace(/[$,]/g, '')) || 0;
+            
+            if (!weddingDateStr || total === 0) {
+                midDateEl.textContent = 'TBD';
+                finalDateEl.textContent = 'TBD';
+                return;
+            }
+
+            const weddingDate = new Date(weddingDateStr + 'T00:00:00'); // Ensure UTC neutrality for date math
+
+            // Final Payment: 30 days before wedding
+            const finalPaymentDate = new Date(weddingDate);
+            finalPaymentDate.setDate(weddingDate.getDate() - 30);
+            
+            // Mid Payment: Halfway point between now and final payment
+            const now = new Date();
+            const timeToFinal = finalPaymentDate.getTime() - now.getTime();
+            const midPaymentTime = now.getTime() + (timeToFinal / 2);
+            const midPaymentDate = new Date(midPaymentTime);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+            
+            if (finalPaymentDate < today) {
+                finalDateEl.textContent = 'Wedding Day (URGENT)';
+            } else {
+                finalDateEl.textContent = formatDate(finalPaymentDate);
+            }
+            
+            if (midPaymentDate < today) {
+                const defaultMidDate = new Date();
+                defaultMidDate.setDate(today.getDate() + 30);
+                midDateEl.textContent = formatDate(defaultMidDate);
+            } else {
+                midDateEl.textContent = formatDate(midPaymentDate);
+            }
+        }
+
+        /**
+         * Formats a number as USD currency string.
+         */
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+        }
+
+        /**
+         * Formats a Date object into a readable date string.
+         */
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        /**
+         * Updates the client name for the printed invoice.
+         */
+        function updatePrintName() {
+            const names = clientNamesInput.value.trim();
+            printClientNameEl.textContent = names || 'Valued Client';
+        }
+        
+        // --- INITIALIZATION ---
+        function init() {
+            // Cache all necessary DOM elements
+            clientNamesInput = document.getElementById('clientNames');
+            weddingDateInput = document.getElementById('weddingDate');
+            printClientNameEl = document.getElementById('print-client-name');
+            printDateEl = document.getElementById('print-date');
+            totalDisplay = document.getElementById('totalDisplay');
+            retainerDisplay = document.getElementById('retainerDisplay');
+            midDateEl = document.getElementById('midDate');
+            midDisplay = document.getElementById('midDisplay');
+            finalDateEl = document.getElementById('finalDate');
+            finalDisplay = document.getElementById('finalDisplay');
+            engagementPackagesContainer = document.getElementById('engagement-packages');
+            weddingPackagesContainer = document.getElementById('wedding-packages');
+            llmModal = document.getElementById('llm-modal');
+            llmModalTitle = document.getElementById('llm-modal-title');
+            llmModalText = document.getElementById('llm-modal-text');
+            loadingOverlay = document.getElementById('loading-overlay');
+            weddingPackageHoursInput = document.getElementById('selectedWeddingPackageHours');
+            guestCountInput = document.getElementById('guestCount');
+            ceremonyVenueInput = document.getElementById('ceremonyVenue');
+            receptionVenueInput = document.getElementById('receptionVenue');
+
+            // 1. Render all package cards using the new, visible detail logic
+            renderPackages(engagementPackages, engagementPackagesContainer, 'engagement');
+            renderPackages(weddingPackages, weddingPackagesContainer, 'wedding');
+            
+            // 2. Calculate initial total (should be 0)
+            calculateTotal(); 
+            
+            // 3. Set print date
+            printDateEl.textContent = formatDate(new Date());
+
+            // 4. Attach Modal Close Listener
+            document.getElementById('llm-modal-close').addEventListener('click', () => {
+                llmModal.classList.add('hidden');
+                llmModal.classList.remove('flex');
+            });
+
+            // 5. Log Firebase status (as per environment requirement)
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            if (Object.keys(firebaseConfig).length > 0) {
+                console.log("Firebase config found. Proceeding with required environment setup (Auth skipped as no data persistence is needed for this client-side invoice calculator).");
+            }
+        }
+
+        // Start the application after all DOM content is loaded
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
